@@ -70,6 +70,9 @@
                 </div>
             </section>
 
+            <!-- ====================================================== -->
+            <!-- SECÇÃO DE ANÁLISE DE COMPLEXIDADE - CORRIGIDA -->
+            <!-- ====================================================== -->
             <section id="complexity-screen" class="screen hidden">
                 <header class="results-header">
                     <h2>Análise de Complexidade Algorítmica com IA</h2>
@@ -87,23 +90,42 @@
                         <textarea id="code-input" placeholder="Cole seu código aqui..."></textarea>
                         <button id="analyze-complexity-btn">
                             <span class="btn-text">Analisar Complexidade</span>
-                            <div class="spinner hidden"></div>
+                            <!-- O spinner no botão é útil, mas adicionaremos um maior para os resultados -->
                         </button>
                     </div>
-                    <div id="complexity-results-container" class="complexity-results hidden">
-                        <h3>Resultado da Análise</h3>
-                        <div id="complexity-overall" class="complexity-badge"></div>
-                        <div class="result-section">
-                            <h4><i class="fas fa-search"></i> Gargalos Detectados</h4>
-                            <ul id="complexity-bottlenecks"></ul>
+                    
+                    <!-- Container de Resultados Corrigido -->
+                    <div class="complexity-results">
+                        <!-- Spinner para feedback de carregamento na área de resultados -->
+                        <div id="complexity-spinner" class="spinner-container hidden">
+                            <div class="spinner"></div>
+                            <p>Analisando o código...</p>
                         </div>
-                        <div class="result-section">
-                            <h4><i class="fas fa-lightbulb"></i> Sugestões de Otimização</h4>
-                            <ul id="complexity-suggestions"></ul>
+
+                        <!-- Container para exibir erros de forma persistente -->
+                        <div id="complexity-error" class="error-message hidden"></div>
+
+                        <!-- Container para os resultados quando a análise for bem-sucedida -->
+                        <div id="complexity-results-container" class="hidden">
+                            <h3>Resultado da Análise</h3>
+                            <div id="complexity-overall" class="complexity-badge"></div>
+                            <div class="result-section">
+                                <h4><i class="fas fa-search"></i> Gargalos Detectados</h4>
+                                <!-- Alterado de <ul> para <div> para renderizar HTML do 'marked.js' corretamente -->
+                                <div id="complexity-bottlenecks"></div>
+                            </div>
+                            <div class="result-section">
+                                <h4><i class="fas fa-lightbulb"></i> Sugestões de Otimização</h4>
+                                <!-- Alterado de <ul> para <div> -->
+                                <div id="complexity-suggestions"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
+            <!-- ====================================================== -->
+            <!-- FIM DA SECÇÃO CORRIGIDA -->
+            <!-- ====================================================== -->
 
         </main>
     </div>
