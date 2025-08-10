@@ -1,0 +1,11 @@
+
+ocid1.compartment.oc1..aaaaaaaaeh6qqb4ynqew7xlgs6cvvtmpmpxlegvxlyrdvlirhmxjv76334bq
+
+[DEFAULT]
+user=ocid1.user.oc1..aaaaaaaawzyhez3gbpbfya3e5nvbdrvnje3pegqxt237extrmd6zd4vlausq
+fingerprint=ea:af:8d:b6:9f:fb:eb:c2:bb:60:b9:2e:2e:74:02:09
+tenancy=ocid1.tenancy.oc1..aaaaaaaa2zjbbbx5w7vd76z662sl76aww4t6lecjmib6ssop54ckzjd27lyq
+region=us-chicago-1
+key_file=<path to your private keyfile> # TODO
+
+ssh -i alexoci2025.pem opc@163.192.101.146

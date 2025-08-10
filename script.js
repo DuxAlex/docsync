@@ -6,7 +6,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Ecrã de Início
     const analyzeBtn = document.getElementById('analyze-btn');
     const repoUrlInput = document.getElementById('repo-url');
+    const githubTokenInput = document.getElementById('github-token');
     const consentCheckbox = document.getElementById('consent-checkbox');
+    const showTokenHelpLink = document.getElementById('show-token-help');
+    const tokenInstructions = document.getElementById('token-instructions');
     
     // Ecrãs de Resultados
     const repoNameSpans = document.querySelectorAll('.repo-name');
@@ -15,6 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Botões de Ação
     const copyBtn = document.getElementById('copy-readme-btn');
+    const exportReadmeBtn = document.getElementById('export-readme-btn');
+    const prReadmeBtn = document.getElementById('pr-readme-btn');
     const commitBtn = document.getElementById('commit-readme-btn');
 
     // Modal de Detalhes de Bugs
@@ -39,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Estado da Aplicação ---
     let currentRepoUrl = '';
+    let githubToken = '';
     let fullReadmeContent = '';
     let fullBugList = [];
 
@@ -154,8 +160,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     analyzeBtn.addEventListener('click', async () => {
         currentRepoUrl = repoUrlInput.value;
+        githubToken = githubTokenInput.value;
+
         if (!currentRepoUrl) {
             alert('Por favor, insira a URL de um repositório.');
+            return;
+        }
+
+        if (!githubToken) {
+            alert('Por favor, insira seu token do GitHub.');
             return;
         }
 
@@ -164,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch("http://localhost:5000/analyze", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ repo_url: currentRepoUrl })
+                body: JSON.stringify({ repo_url: currentRepoUrl, token: githubToken })
             });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error);
@@ -199,6 +212,59 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     closeModalBtn.addEventListener('click', closeBugModal);
     modalOverlay.addEventListener('click', closeBugModal);
+
+    showTokenHelpLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        tokenInstructions.classList.toggle('hidden');
+    });
+
+    exportReadmeBtn.addEventListener('click', () => {
+        if (!fullReadmeContent) return;
+        const blob = new Blob([fullReadmeContent], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'README.md';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
+
+    commitBtn.addEventListener('click', async () => {
+        if (!currentRepoUrl || !fullReadmeContent || !githubToken) {
+            alert('Repositório, README ou token não disponíveis. Analise primeiro.');
+            return;
+        }
+
+        const commitMessage = prompt("Digite a mensagem de commit:", "docs: update README.md by DocSync AI");
+        if (!commitMessage) return; // User cancelled
+
+        toggleButtonSpinner(commitBtn, true);
+        try {
+            const response = await fetch("http://localhost:5000/commit", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    repo_url: currentRepoUrl, 
+                    readme_content: fullReadmeContent, 
+                    token: githubToken,
+                    commit_message: commitMessage
+                })
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error);
+            alert('Commit realizado com sucesso!');
+        } catch (error) {
+            alert(`Erro ao fazer commit: ${error.message}`);
+        } finally {
+            toggleButtonSpinner(commitBtn, false);
+        }
+    });
+
+    prReadmeBtn.addEventListener('click', async () => {
+        alert('A funcionalidade de criar Pull Request ainda não foi implementada no backend.');
+    });
 
     analyzeComplexityBtn.addEventListener('click', async () => {
         const code = codeInput.value;

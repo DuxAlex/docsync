@@ -3,6 +3,7 @@ import base64
 import requests
 import google.generativeai as genai
 import json
+import re
 from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 from flask_cors import CORS
@@ -128,8 +129,20 @@ def analyze():
     try:
         print("🤖 Enviando dados para análise completa no Gemini...")
         resposta = model.generate_content(prompt)
-        cleaned_response = resposta.text.strip().replace("```json", "").replace("```", "").strip()
-        analysis_json = json.loads(cleaned_response)
+        
+        # Limpa a resposta para extrair apenas o conteúdo JSON.
+        cleaned_text = resposta.text.strip()
+        
+        # Encontra o início e o fim do objeto JSON.
+        json_start = cleaned_text.find('{')
+        json_end = cleaned_text.rfind('}') + 1
+        
+        if json_start != -1 and json_end != 0:
+            json_str = cleaned_text[json_start:json_end]
+            analysis_json = json.loads(json_str)
+        else:
+            # Se não encontrar um JSON, lança um erro.
+            raise ValueError("Nenhum objeto JSON válido encontrado na resposta.")
         print("✅ Análise completa recebida.")
         return jsonify(analysis_json)
     except Exception as e:
@@ -155,8 +168,21 @@ def analyze_complexity():
     """
     try:
         resposta = model.generate_content(prompt)
-        cleaned_response = resposta.text.strip().replace("```json", "").replace("```", "").strip()
-        analysis_json = json.loads(cleaned_response)
+        
+        # Limpa a resposta para extrair apenas o conteúdo JSON.
+        cleaned_text = resposta.text.strip()
+        
+        # Encontra o início e o fim do objeto JSON.
+        json_start = cleaned_text.find('{')
+        json_end = cleaned_text.rfind('}') + 1
+        
+        if json_start != -1 and json_end != 0:
+            json_str = cleaned_text[json_start:json_end]
+            analysis_json = json.loads(json_str)
+        else:
+            # Se não encontrar um JSON, lança um erro.
+            raise ValueError("Nenhum objeto JSON válido encontrado na resposta.")
+            
         return jsonify(analysis_json)
     except Exception as e:
         return jsonify({"error": f"Erro ao gerar análise com o modelo de IA: {str(e)}"}), 500
@@ -171,7 +197,8 @@ def commit_readme():
     data = request.json
     repo_url = data.get("repo_url")
     readme_content = data.get("readme_content")
-    user_token = data.get("github_token") # Essencial para repositórios privados
+    user_token = data.get("github_token")
+    commit_message = data.get("commit_message", "docs: README.md gerado por IA (DocSync AI)") # Mensagem de fallback
 
     if not all([repo_url, readme_content]):
         return jsonify({"error": "Dados insuficientes para o commit."}), 400
@@ -187,7 +214,7 @@ def commit_readme():
     url = f"https://api.github.com/repos/{owner}/{repo}/contents/README.md"
     content_b64 = base64.b64encode(readme_content.encode("utf-8")).decode("utf-8")
     payload = {
-        "message": "docs: README.md gerado por IA (DocSync AI)",
+        "message": commit_message,
         "content": content_b64,
     }
 
@@ -214,6 +241,11 @@ def commit_readme():
         error_details = put_res.json()
         print(f"❌ Erro ao fazer commit: {error_details}")
         return jsonify({"error": f"Erro ao fazer commit no GitHub: {error_details.get('message', 'Erro desconhecido')}"}), 500
+
+
+@app.route("/pull-request", methods=["POST"])
+def pull_request():
+    return jsonify({"error": "A funcionalidade de criar Pull Request ainda não foi implementada."}), 501
 
 
 if __name__ == "__main__":

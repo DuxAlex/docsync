@@ -35,6 +35,22 @@
                         <i class="fab fa-github"></i>
                         <input type="text" id="repo-url" placeholder="Cole a URL do seu repositório GitHub aqui">
                     </div>
+                    <div class="input-group">
+                        <i class="fas fa-key"></i>
+                        <input type="password" id="github-token" placeholder="Cole seu Token do GitHub aqui">
+                    </div>
+                    <div class="token-help">
+                        <a href="#" id="show-token-help">Como gerar um token do GitHub?</a>
+                        <div id="token-instructions" class="hidden">
+                            <ol>
+                                <li>Vá para <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a>.</li>
+                                <li>Clique em "Generate new token" (Gerar novo token).</li>
+                                <li>Dê um nome ao seu token (por exemplo, "docsync-ai").</li>
+                                <li>Selecione o escopo <strong>repo</strong> para permitir o acesso a repositórios públicos e privados.</li>
+                                <li>Clique em "Generate token" e copie o token gerado.</li>
+                            </ol>
+                        </div>
+                    </div>
                     <div class="consent-group">
                         <input type="checkbox" id="consent-checkbox">
                         <label for="consent-checkbox">Eu entendo que o código e os commits do meu repositório serão analisados apenas para fins de leitura e não serão armazenados.</label>
@@ -51,6 +67,7 @@
                     <h2>README.md para: <span class="repo-name"></span></h2>
                     <div class="main-actions">
                         <button id="copy-readme-btn" class="btn-secondary"><i class="fas fa-copy"></i> Copiar</button>
+                        <button id="export-readme-btn" class="btn-secondary"><i class="fas fa-download"></i> Exportar como Markdown</button>
                         <button id="pr-readme-btn" class="btn-secondary"><i class="fas fa-code-pull-request"></i> Criar Pull Request</button>
                         <button id="commit-readme-btn"><i class="fas fa-check"></i> Commitar README.md</button>
                     </div>
